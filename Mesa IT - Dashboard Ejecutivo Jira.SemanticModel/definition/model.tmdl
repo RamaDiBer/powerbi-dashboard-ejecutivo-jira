@@ -1,0 +1,24 @@
+model Model
+	culture: es-AR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-AR
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Jira"]
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table Jira
+ref table DateTableTemplate_5696d609-ca89-4fde-85dc-c29eed933fcb
+ref table LocalDateTable_d5a29c7d-da65-436a-b198-1fb664366c71
+ref table LocalDateTable_8742d6b5-1d13-41b9-b9a0-e88339951322
+ref table LocalDateTable_75acd9b0-148d-4636-b91f-5d7b5f79599c
+ref table Meses
+
+ref cultureInfo es-AR
+

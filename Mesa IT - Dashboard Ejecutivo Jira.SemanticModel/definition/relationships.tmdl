@@ -1,0 +1,15 @@
+relationship 7238cd96-8d90-4a3d-af16-8484f3cc4d57
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Jira.Creado
+	toColumn: LocalDateTable_d5a29c7d-da65-436a-b198-1fb664366c71.Date
+
+relationship 386f3b7d-be4c-4d47-af1a-7e452eb5079a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Jira.Actualizado
+	toColumn: LocalDateTable_8742d6b5-1d13-41b9-b9a0-e88339951322.Date
+
+relationship abdb4ca1-7c81-4e0e-9c09-eff6383615db
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Jira.Fecha_Resolucion
+	toColumn: LocalDateTable_75acd9b0-148d-4636-b91f-5d7b5f79599c.Date
+

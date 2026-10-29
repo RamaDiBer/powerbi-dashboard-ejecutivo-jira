@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Mesa IT - Dashboard Ejecutivo Jira"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "45d1d4e6-6551-4c2c-af30-4895472c2f2f"
+  }
+}

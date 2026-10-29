@@ -1,0 +1,27 @@
+/// Meses para comparar tickets creados vs resueltos (tabla sin relación, se cruza con TREATAS)
+table Meses
+	lineageTag: 86fb1afa-0807-4722-9d65-bbc84150ed61
+
+	column MesOrden
+		isHidden
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MesOrden]
+
+	column Mes
+		isNameInferred
+		sourceColumn: [Mes]
+		sortByColumn: MesOrden
+
+	partition Meses = calculated
+		mode: import
+		source =
+				
+				DISTINCT(
+				    SELECTCOLUMNS(
+				        CALENDAR(DATE(2025, 11, 1), TODAY()),
+				        "MesOrden", YEAR([Date]) * 100 + MONTH([Date]),
+				        "Mes", FORMAT([Date], "mmm yyyy")
+				    )
+				)
+

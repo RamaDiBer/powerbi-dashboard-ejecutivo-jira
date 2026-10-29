@@ -1,0 +1,962 @@
+table Jira
+	lineageTag: 5c20ece5-8fdd-48a5-8973-fd46d4098eb9
+
+	measure 'Total Tickets' =
+			
+			COUNTROWS('Jira')
+		formatString: 0
+		lineageTag: ce69ce28-e789-4786-a0ea-1c65d0cec8dc
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Tickets Alta' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    Jira[Prioridad] = "Alta"
+			)
+		formatString: 0
+		lineageTag: 7560f5b0-1d34-40a1-b34a-7cfca24aff8c
+
+	measure 'Tickets Bloqueantes' = ```
+			
+			CALCULATE( 
+			    COUNTROWS(Jira),
+			    Jira[Prioridad] = "Bloqueante"
+			)
+			```
+		formatString: 0
+		lineageTag: 8926aa9c-0b44-45b6-988d-22e32210c5e5
+
+	measure 'Tickets Abiertos' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    NOT Jira[Estado] IN {
+			        "Cancelado",
+			        "Cerrada",
+			        "Completado",
+			        "Resuelta",
+			        "Resuelto Automation"
+			    }
+			)
+		formatString: 0
+		lineageTag: 7b8ca72e-9a9d-4ed3-8b05-68cfa3c0a724
+
+	measure 'Tickets Cerrados' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    Jira[Estado] IN {
+			        "Cancelado",
+			        "Cerrada",
+			        "Completado",
+			        "Resuelta",
+			        "Resuelto Automation"
+			    }
+			)
+		formatString: 0
+		lineageTag: 70aac4e3-8ac0-4f27-99bd-526aebf44fbb
+
+	measure '% Tickets Abiertos' =
+			
+			DIVIDE(
+			    [Tickets Abiertos],
+			    [Total Tickets],
+			    0
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 276c2888-fe26-4306-93f8-e5b7b0f23abf
+
+	measure 'Promedio Resolución' =
+			
+			AVERAGEX(
+			    FILTER(Jira, NOT ISBLANK(Jira[Horas Resolución]) && Jira[Horas Resolución] <> ""),
+			    VALUE(Jira[Horas Resolución])
+			)
+		formatString: 0.0
+		lineageTag: 15adf12a-3d39-464c-b42f-12207a18ca64
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Promedio Atención' =
+			
+			AVERAGE(Jira[Atencion_Horas])
+		lineageTag: b38da639-a397-42d8-b26d-928e40a7ac1f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mediana Atención' =
+			
+			MEDIAN(Jira[Atencion_Horas])
+		lineageTag: ba3f1df2-581e-4fac-883a-8c2a3b64094f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Mediana Resolución' =
+			
+			MEDIAN(Jira[Dias_Totales_Cierre])
+		lineageTag: b10a9f5b-155b-4a58-b61a-843f48df5250
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'SLA Vencidos' = ```
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    Jira[Atencion_SLA_Vencido] = TRUE()
+			)
+			
+			```
+		formatString: 0
+		lineageTag: fddf3a97-0f30-46f4-8961-0e8d9dca9b8a
+
+	measure 'SLA Cumplidos' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    Jira[Atencion_SLA_Vencido]=FALSE()
+			)
+		formatString: 0
+		lineageTag: 71c1ca1e-96a7-4434-a29f-e988d500d874
+
+	measure '% SLA Cumplido' =
+			
+			DIVIDE(
+			    [SLA Cumplidos],
+			    [SLA Cumplidos] + [SLA Vencidos]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 63c64ce8-e0f7-40a2-9643-d503030bd9e3
+
+	measure 'Total Tickets Evolucion' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    REMOVEFILTERS(Jira[AñoTxt]),
+			    REMOVEFILTERS(Jira[MesTxt]),
+			    REMOVEFILTERS(Jira[Estado Operativo])
+			)
+		formatString: 0
+		lineageTag: 75d64cea-e763-490e-a270-7e584406156b
+
+	measure 'Cantidad de tickets' =
+			
+			FORMAT(
+			    COUNTROWS(Jira),
+			    "#,##0"
+			)
+		lineageTag: c690c056-70ec-47f1-9d47-dafa2b59d347
+
+	measure 'Tickets Bloqueantes Cerrados' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    Jira[Prioridad] = "Bloqueante",
+			    Jira[Estado Operativo] = "Cerrado"
+			)
+		formatString: 0
+		lineageTag: d92ff7ed-0323-4c10-8fb0-9d1d82eebf52
+
+	measure '% Bloqueantes Cerrados' =
+			
+			DIVIDE(
+			    [Tickets Bloqueantes Cerrados],
+			    [Tickets Bloqueantes]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: 0e891323-6865-4c3e-b1e0-7b11a13878c1
+
+	measure 'Tickets Alta Cerrados' =
+			
+			CALCULATE(
+			    COUNTROWS(jira),
+			    Jira[Prioridad] = "Alta",
+			    Jira[Estado Operativo] = "Cerrado"
+			)
+		formatString: 0
+		lineageTag: 1d21b50c-567b-4f6c-abd9-242efbbdaca6
+
+	measure '% Alta Cerrado' =
+			
+			DIVIDE(
+			    [Tickets Alta Cerrados],
+			    [Tickets Alta]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		lineageTag: c42ca600-cded-40bb-a3a1-deb71ded2cec
+
+	measure '% Tickets Cerrados' = DIVIDE([Tickets Cerrados], [Total Tickets])
+		formatString: 0.0 %;-0.0 %;0.0 %
+		displayFolder: Resumen Operativo
+		lineageTag: c582afd0-4318-4cdb-b18f-fb0bfc192fe0
+
+	measure 'Antigüedad Abiertos (días)' =
+			
+			AVERAGEX(
+			    FILTER(
+			        Jira,
+			        NOT Jira[Estado] IN { "Cancelado", "Cerrada", "Completado", "Resuelta", "Resuelto Automation" }
+			    ),
+			    DATEDIFF(Jira[Creado], TODAY(), DAY)
+			)
+		formatString: 0
+		displayFolder: Resumen Operativo
+		lineageTag: 2a235cdc-6811-4bb4-b921-53cebb8d7ba4
+
+	measure 'Abiertos +30 días' =
+			
+			COUNTROWS(
+			    FILTER(
+			        Jira,
+			        NOT Jira[Estado] IN { "Cancelado", "Cerrada", "Completado", "Resuelta", "Resuelto Automation" }
+			            && DATEDIFF(Jira[Creado], TODAY(), DAY) > 30
+			    )
+			) + 0
+		formatString: 0
+		displayFolder: Resumen Operativo
+		lineageTag: 5ff7f315-1153-4234-9fd7-36c39f74bce1
+
+	measure 'Promedio Mensual Tickets' = AVERAGEX(VALUES(Jira[MesAño]), [Total Tickets])
+		formatString: 0
+		displayFolder: Resumen Operativo
+		lineageTag: d7c96845-38b6-4daf-a79b-c1425dd286df
+
+	/// Tickets creados en el mes de la tabla Meses. Ignora los filtros de año/mes de Jira para poder compararse con resueltos.
+	measure 'Tickets Creados (mes)' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    REMOVEFILTERS(Jira[Año], Jira[AñoTxt], Jira[MesNro], Jira[MesTxt], Jira[MesAño], Jira[MesAñoOrdne]),
+			    TREATAS(VALUES(Meses[MesOrden]), Jira[MesAñoOrdne])
+			)
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: ffba0245-eeea-4f90-a269-936f51179f58
+
+	/// Tickets con fecha de resolución en el mes de la tabla Meses.
+	measure 'Tickets Resueltos (mes)' =
+			
+			CALCULATE(
+			    COUNTROWS(Jira),
+			    REMOVEFILTERS(Jira[Año], Jira[AñoTxt], Jira[MesNro], Jira[MesTxt], Jira[MesAño], Jira[MesAñoOrdne]),
+			    TREATAS(VALUES(Meses[MesOrden]), Jira[MesResolucionOrden])
+			)
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: 7e2c58c5-e97d-49d5-b7b8-7062636d3755
+
+	/// Creados menos resueltos: positivo = se acumulan tickets
+	measure 'Saldo del mes' = [Tickets Creados (mes)] - [Tickets Resueltos (mes)]
+		formatString: +0;-0;0
+		displayFolder: Análisis Operativo
+		lineageTag: a42947ed-fb1a-44c8-86e8-18f7cc0c1ff5
+
+	measure Fallas = CALCULATE([Total Tickets], Jira[Categoría] = "Falla")
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: 57bada05-cd51-4cd2-a2d2-bc1ffbb43143
+
+	measure Pedidos = CALCULATE([Total Tickets], Jira[Categoría] = "Pedido / Servicio")
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: 1cac1ea7-9266-4170-a6f2-7e308a87c97f
+
+	measure '% Fallas' = DIVIDE([Fallas], [Total Tickets])
+		formatString: 0.0 %;-0.0 %;0.0 %
+		displayFolder: Análisis Operativo
+		lineageTag: eb7fc350-e699-42bf-a568-c8b0e247ddd2
+
+	/// Horas registradas en el worklog de Jira
+	measure 'Horas Trabajadas' = SUM(Jira[Horas_Trabajadas])
+		formatString: #,0
+		displayFolder: Análisis Operativo
+		lineageTag: ad350a5e-99f0-4996-804a-8ebb1131f887
+
+	/// Promedio de horas registradas, solo tickets con horas cargadas
+	measure 'Horas por Ticket' = DIVIDE([Horas Trabajadas], CALCULATE([Total Tickets], Jira[Horas_Trabajadas] > 0))
+		formatString: 0.0
+		displayFolder: Análisis Operativo
+		lineageTag: 4ce13afe-9479-45c3-9736-6c6652856e6d
+
+	/// Cantidad de fallas con el mismo título, solo si se repite 3 o más veces
+	measure 'Veces Repetida' =
+			
+			VAR n = [Fallas]
+			RETURN IF(n >= 3, n)
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: 1e3f521c-ef1c-4445-b290-72f56de0cb93
+
+	/// Cantidad de títulos de falla distintos que se repiten 3 o más veces
+	measure 'Fallas Recurrentes' = COUNTROWS(FILTER(VALUES(Jira[Resumen Normalizado]), [Fallas] >= 3)) + 0
+		formatString: 0
+		displayFolder: Análisis Operativo
+		lineageTag: 6268dd3f-5513-402c-b2cd-29ee872c418a
+
+	column Ticket
+		dataType: string
+		lineageTag: 31ec35c2-155f-41d9-b888-584f62276d0a
+		summarizeBy: none
+		sourceColumn: Ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Nombre del Ticket'
+		dataType: string
+		lineageTag: be57b287-b13f-4ec4-9c2c-5673597ead3d
+		summarizeBy: none
+		sourceColumn: Nombre del Ticket
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 1a116574-0fad-4bbf-a2e4-a7550c50c913
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Asignado
+		dataType: string
+		lineageTag: da1615ce-3507-4545-8acc-7151c00d4e0b
+		summarizeBy: none
+		sourceColumn: Asignado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prioridad
+		dataType: string
+		lineageTag: b5e49c9f-1a58-44bb-94c2-09b57a818e8d
+		summarizeBy: none
+		sourceColumn: Prioridad
+		sortByColumn: OrdenPrioridad
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo
+		dataType: string
+		lineageTag: 789c3bea-7061-4abc-8310-51d396a0eb08
+		summarizeBy: none
+		sourceColumn: Tipo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Planta
+		dataType: string
+		lineageTag: b8d126b2-9a36-478d-816e-1f68caf06f60
+		summarizeBy: none
+		sourceColumn: Planta
+
+		annotation SummarizationSetBy = Automatic
+
+	column Creado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b01533a6-0e7e-4fc5-8109-7bcfb1935dda
+		summarizeBy: none
+		sourceColumn: Creado
+
+		variation Variación
+			isDefault
+			relationship: 7238cd96-8d90-4a3d-af16-8484f3cc4d57
+			defaultHierarchy: LocalDateTable_d5a29c7d-da65-436a-b198-1fb664366c71.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Actualizado
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 177039ad-3eb0-429f-a668-7f28ff757226
+		summarizeBy: none
+		sourceColumn: Actualizado
+
+		variation Variación
+			isDefault
+			relationship: 386f3b7d-be4c-4d47-af1a-7e452eb5079a
+			defaultHierarchy: LocalDateTable_8742d6b5-1d13-41b9-b9a0-e88339951322.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Estado Operativo' =
+			
+			SWITCH(
+			    TRUE(),
+			    Jira[Estado] = "Cancelado", "Cerrado",
+			    Jira[Estado] = "Cerrada", "Cerrado",
+			    Jira[Estado] = "Completado", "Cerrado",
+			    Jira[Estado] = "Resuelta", "Cerrado",
+			
+			    Jira[Estado] = "En Curso", "En Trabajo",
+			    Jira[Estado] = "En curso", "En Trabajo",
+			    Jira[Estado] = "En Implementación", "En Trabajo",
+			
+			    "Pendiente"
+			)
+		lineageTag: df5d017c-f023-4f82-9838-437191ce64ba
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Año = YEAR(Jira[Creado])
+		dataType: string
+		lineageTag: 8787f827-5dbe-408c-a8b2-25c9c4199763
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesNro = MONTH(Jira[Creado])
+		formatString: 0
+		lineageTag: aba06b32-3403-4c49-9046-dc130b8a41de
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesTxt =
+			
+			UPPER(LEFT(FORMAT(Jira[Creado], "MMMM"),1))
+			&
+			LOWER(
+			    MID(
+			        FORMAT(Jira[Creado], "MMMM"),
+			        2,
+			        100
+			    )
+			)
+		lineageTag: e0b9c3c4-c9cf-453c-b984-ef7a4bf62858
+		summarizeBy: none
+		sortByColumn: MesNro
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAño =
+			
+			FORMAT(Jira[Creado], "MMM yyyy")
+		lineageTag: 5a6de07e-0685-4a95-968f-767bbb4a09ec
+		summarizeBy: none
+		sortByColumn: MesAñoOrdne
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column AñoTxt = FORMAT(Jira[Creado], "YYYY")
+		lineageTag: 67afb183-77ec-4d90-bbea-b4a10118da25
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MesAñoOrdne =
+			
+			YEAR(Jira[Creado])* 100
+			+
+			MONTH(Jira[Creado])
+		formatString: 0
+		lineageTag: b1ae9de2-2df5-47e7-8b5c-e8c520e75ce8
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Grupo_Resolutor
+		dataType: string
+		lineageTag: 0750a69e-a149-44e7-80ad-333146317962
+		summarizeBy: none
+		sourceColumn: Grupo_Resolutor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aplicacion
+		dataType: string
+		lineageTag: 52e98c70-d7f3-4d5d-b8fd-b70f170f6dcb
+		summarizeBy: none
+		sourceColumn: Aplicacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fecha_Resolucion
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f623d57b-097e-4752-9348-a59c9d745967
+		summarizeBy: none
+		sourceColumn: Fecha_Resolucion
+
+		variation Variación
+			isDefault
+			relationship: abdb4ca1-7c81-4e0e-9c09-eff6383615db
+			defaultHierarchy: LocalDateTable_75acd9b0-148d-4636-b91f-5d7b5f79599c.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Atencion_Horas
+		dataType: double
+		lineageTag: a7c94f06-6ecc-4876-9b6b-7b4c2819db8c
+		summarizeBy: sum
+		sourceColumn: Atencion_Horas
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Atencion_SLA_Vencido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 363e83c5-a241-434c-a752-ffb4685c0aa2
+		summarizeBy: none
+		sourceColumn: Atencion_SLA_Vencido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolucion_Horas
+		dataType: string
+		lineageTag: dbbeec58-263c-44c5-b5a8-d01b792572d9
+		summarizeBy: none
+		sourceColumn: Resolucion_Horas
+
+		annotation SummarizationSetBy = Automatic
+
+	column Resolucion_SLA_Vencido
+		dataType: string
+		lineageTag: e77f5749-8611-4b57-ad79-af8371e137ec
+		summarizeBy: none
+		sourceColumn: Resolucion_SLA_Vencido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dias_Totales_Cierre
+		dataType: double
+		lineageTag: 343d09ba-437e-47f6-9f9b-b85b771325d7
+		summarizeBy: sum
+		sourceColumn: Dias_Totales_Cierre
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Días Resolución' =
+			
+			IF(
+			    ISBLANK(Jira[Fecha_Resolucion]),
+			    BLANK(),
+			    DATEDIFF(
+			        Jira[Creado],
+			        Jira[Fecha_Resolucion],DAY
+			    )
+			)
+		formatString: 0
+		lineageTag: ce77906b-4393-4c72-84eb-247bc50b53cb
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Resolución' =
+			
+			IF(
+			    ISBLANK(Jira[Fecha_Resolucion]),
+			    BLANK(),
+			    DATEDIFF(
+			        Jira[Creado],
+			        Jira[Fecha_Resolucion],HOUR
+			    )
+			)
+		dataType: string
+		lineageTag: 724890e6-4eb5-4764-9438-e9d3c82cf45d
+		summarizeBy: none
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrdenPrioridad
+		dataType: string
+		lineageTag: 369aa900-86fb-4465-8a80-ffed0642d577
+		summarizeBy: none
+		sourceColumn: OrdenPrioridad
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Equipo Sistemas' =
+			
+			IF(
+			    Jira[Asignado] IN {
+			        "Técnico 1",
+			        "Técnico 2",
+			        "Técnico 3",
+			        "Técnico 4",
+			        "Técnico 5",
+			        "Técnico 6",
+			        "Técnico 7"
+			    },
+			    "Sistemas",
+			    "Otros"
+			)
+		lineageTag: 24532dc8-ab7b-4954-9623-b9a5325e2b45
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Informante
+		dataType: string
+		lineageTag: 65e4c2ed-5e79-4ce4-92bb-6bcc74b9b52b
+		summarizeBy: none
+		sourceColumn: Informante
+
+	column Componente
+		dataType: string
+		lineageTag: 739de97a-7cae-4b2f-b5bd-0081eae7d9f1
+		summarizeBy: none
+		sourceColumn: Componente
+
+	column Area_Requirente
+		dataType: string
+		lineageTag: bdcccb80-c220-439f-a7d8-1ef81d60a021
+		summarizeBy: none
+		sourceColumn: Area_Requirente
+
+	column Horas_Trabajadas
+		dataType: double
+		formatString: 0.0
+		lineageTag: d9d176b0-1312-4106-b1d8-5f34880ed690
+		summarizeBy: sum
+		sourceColumn: Horas_Trabajadas
+
+	/// Falla = Problema o Incidente; el resto son pedidos de servicio
+	column Categoría = IF(Jira[Tipo] IN {"Problema", "Incidente"}, "Falla", "Pedido / Servicio")
+		lineageTag: ddce66c3-39ad-495e-9f36-93a74dc56be9
+
+	/// Título en minúsculas y sin punto final, para agrupar tickets repetidos
+	column 'Resumen Normalizado' =
+			
+			VAR t = LOWER(TRIM(Jira[Nombre del Ticket]))
+			RETURN IF(RIGHT(t, 1) = ".", LEFT(t, LEN(t) - 1), t)
+		lineageTag: c81846de-18a4-4c66-879d-e04978302414
+
+	column MesResolucionOrden = IF(NOT ISBLANK(Jira[Fecha_Resolucion]), YEAR(Jira[Fecha_Resolucion]) * 100 + MONTH(Jira[Fecha_Resolucion]))
+		isHidden
+		lineageTag: 9536bd70-f277-471f-851e-7966fde7ef6a
+		summarizeBy: none
+
+	partition Jira = m
+		mode: import
+		source =
+				let
+				    BaseUrl = "https://mirgor.atlassian.net",
+				
+				    ValoresPlanta = {"Rodney", "Escobar", "Fortinox", "Rosario - Enllantado"},
+				
+				    // Rosario - Enllantado no existe como opción en Unidad de Negocio (customfield_10168): no agregarlo ahí o la consulta falla
+				    JQL =
+				        "project = MDSURET AND created >= ""2025-11-01"" AND (" &
+				        "customfield_10434 IN (""Rodney"", ""Escobar"", ""Fortinox"", ""Rosario - Enllantado"") OR " &
+				        "customfield_10128 IN (""Rodney"", ""Escobar"", ""Fortinox"", ""Rosario - Enllantado"") OR " &
+				        "customfield_10168 IN (""Rodney"", ""Escobar"", ""Fortinox"")" &
+				        ")",
+				
+				    // components = Componente, reporter = Informante, timespent = horas registradas, customfield_10187 = Dirección Requirente
+				    Fields =
+				        "summary,status,assignee,priority,created,updated,resolutiondate,issuetype," &
+				        "customfield_10434,customfield_10128,customfield_10168," &
+				        "customfield_10232,customfield_10233,customfield_11073,customfield_10443,customfield_10167," &
+				        "components,reporter,timespent,customfield_10187",
+				
+				    GetPage = (Token as nullable text) =>
+				        let
+				            QueryParams =
+				                if Token = null then
+				                    [
+				                        jql = JQL,
+				                        fields = Fields
+				                    ]
+				                else
+				                    [
+				                        jql = JQL,
+				                        fields = Fields,
+				                        nextPageToken = Token
+				                    ],
+				
+				            Response = Json.Document(
+				                Web.Contents(
+				                    BaseUrl,
+				                    [
+				                        RelativePath = "rest/api/3/search/jql",
+				                        Query = QueryParams
+				                    ]
+				                )
+				            )
+				        in
+				            Response,
+				
+				    Pages =
+				        List.Generate(
+				            () => GetPage(null),
+				            each _ <> null,
+				            each
+				                if Record.Field(_, "isLast") = true then
+				                    null
+				                else
+				                    GetPage(Record.Field(_, "nextPageToken")),
+				            each _
+				        ),
+				
+				    TodasLasIssues =
+				        List.Combine(
+				            List.Transform(Pages, each [issues])
+				        ),
+				
+				    Tabla =
+				        Table.FromList(
+				            TodasLasIssues,
+				            Splitter.SplitByNothing(),
+				            null,
+				            null,
+				            ExtraValues.Error
+				        ),
+				
+				    Expandido =
+				        Table.ExpandRecordColumn(
+				            Tabla,
+				            "Column1",
+				            {"key", "fields"},
+				            {"key", "fields"}
+				        ),
+				
+				    Fields_Exp =
+				        Table.ExpandRecordColumn(
+				            Expandido,
+				            "fields",
+				            {
+				                "summary",
+				                "status",
+				                "assignee",
+				                "priority",
+				                "created",
+				                "updated",
+				                "resolutiondate",
+				                "issuetype",
+				                "customfield_10434",
+				                "customfield_10128",
+				                "customfield_10168",
+				                "customfield_10232",
+				                "customfield_10233",
+				                "customfield_11073",
+				                "customfield_10443",
+				                "customfield_10167",
+				                "components",
+				                "reporter",
+				                "timespent",
+				                "customfield_10187"
+				            },
+				            {
+				                "summary",
+				                "status",
+				                "assignee",
+				                "priority",
+				                "created",
+				                "updated",
+				                "resolutiondate",
+				                "issuetype",
+				                "customfield_10434",
+				                "customfield_10128",
+				                "customfield_10168",
+				                "customfield_10232",
+				                "customfield_10233",
+				                "customfield_11073",
+				                "customfield_10443",
+				                "customfield_10167",
+				                "components",
+				                "reporter",
+				                "timespent",
+				                "customfield_10187"
+				            }
+				        ),
+				
+				    // Expansiones básicas
+				    Status = Table.ExpandRecordColumn(Fields_Exp, "status", {"name"}, {"Estado"}),
+				    Assignee = Table.ExpandRecordColumn(Status, "assignee", {"displayName"}, {"Asignado"}),
+				    Priority = Table.ExpandRecordColumn(Assignee, "priority", {"name"}, {"Prioridad"}),
+				    IssueType = Table.ExpandRecordColumn(Priority, "issuetype", {"name"}, {"Tipo"}),
+				    Reporter = Table.ExpandRecordColumn(IssueType, "reporter", {"displayName"}, {"Informante"}),
+				
+				    // Planta / Site / Unidad de Negocio
+				    CF10434 = Table.ExpandRecordColumn(Reporter, "customfield_10434", {"value"}, {"_CampoPlanta"}),
+				    CF10128 = Table.ExpandRecordColumn(CF10434, "customfield_10128", {"value"}, {"_CampoSiteOrigen"}),
+				    CF10168 = Table.ExpandRecordColumn(CF10128, "customfield_10168", {"value"}, {"_CampoUnidadNegocio"}),
+				
+				    ConPlanta =
+				        Table.AddColumn(
+				            CF10168,
+				            "Planta",
+				            each
+				                if List.Contains(ValoresPlanta, [_CampoPlanta]) then
+				                    [_CampoPlanta]
+				                else if List.Contains(ValoresPlanta, [_CampoSiteOrigen]) then
+				                    [_CampoSiteOrigen]
+				                else if List.Contains(ValoresPlanta, [_CampoUnidadNegocio]) then
+				                    [_CampoUnidadNegocio]
+				                else
+				                    null,
+				            type text
+				        ),
+				
+				    Filtrados = Table.SelectRows(ConPlanta, each [Planta] <> null),
+				
+				    LimpioCamposAux =
+				        Table.RemoveColumns(
+				            Filtrados,
+				            {"_CampoPlanta", "_CampoSiteOrigen", "_CampoUnidadNegocio"}
+				        ),
+				
+				    // Funciones auxiliares para parsear campos complejos sin error
+				    fnGetOptionValue = (val as any) =>
+				        if val is record then
+				            if Record.HasFields(val, "value") and Record.Field(val, "value") <> null then Record.Field(val, "value")
+				            else if Record.HasFields(val, "name") and Record.Field(val, "name") <> null then Record.Field(val, "name")
+				            else null
+				        else if val is text then val
+				        else null,
+				
+				    fnGetNombreGrupo = (val as any) =>
+				        if val is record then
+				            if Record.HasFields(val, "name") and Record.Field(val, "name") <> null then Record.Field(val, "name")
+				            else if Record.HasFields(val, "value") and Record.Field(val, "value") <> null then Record.Field(val, "value")
+				            else null
+				        else if val is text then val
+				        else null,
+				
+				    // Extracción de Grupo Resolutor
+				    AddGrupoResolutor = Table.AddColumn(LimpioCamposAux, "Grupo_Resolutor", each fnGetNombreGrupo([customfield_11073]), type text),
+				
+				    // Extracción de Aplicación (unificando Aplicaciones mesa IT y Aplicaciones)
+				    AddApp1 = Table.AddColumn(AddGrupoResolutor, "_app1", each fnGetOptionValue([customfield_10443]), type text),
+				    AddApp2 = Table.AddColumn(AddApp1, "_app2", each fnGetOptionValue([customfield_10167]), type text),
+				    ConsolidarApp = Table.AddColumn(
+				        AddApp2,
+				        "Aplicacion",
+				        each if [_app1] <> null and [_app1] <> "" then [_app1] else [_app2],
+				        type text
+				    ),
+				
+				    LimpioApps = Table.RemoveColumns(ConsolidarApp, {"_app1", "_app2", "customfield_11073", "customfield_10443", "customfield_10167"}),
+				
+				    // Componente (puede haber varios), Dirección Requirente y horas registradas en worklog
+				    AddComponente = Table.AddColumn(
+				        LimpioApps,
+				        "Componente",
+				        each
+				            if [components] is list and List.Count([components]) > 0 then
+				                Text.Combine(List.Transform([components], each fnGetOptionValue(_)), ", ")
+				            else
+				                null,
+				        type text
+				    ),
+				    AddArea = Table.AddColumn(AddComponente, "Area_Requirente", each fnGetOptionValue([customfield_10187]), type text),
+				    AddHoras = Table.AddColumn(AddArea, "Horas_Trabajadas", each if [timespent] is number then Number.Round([timespent] / 3600, 2) else null, type number),
+				    LimpioExtras = Table.RemoveColumns(AddHoras, {"components", "customfield_10187", "timespent"}),
+				
+				    // Conversión de tipos de Fechas
+				    TiposFechas =
+				        Table.TransformColumnTypes(
+				            LimpioExtras,
+				            {
+				                {"created", type datetimezone},
+				                {"updated", type datetimezone},
+				                {"resolutiondate", type datetimezone}
+				            }
+				        ),
+				
+				    // --- EXTRACCIÓN DE MÉTRICAS DE SLA ---
+				    fnParseSLA = (slaRecord as nullable record) as record =>
+				        let
+				            completedCycles = if slaRecord <> null and Record.HasFields(slaRecord, "completedCycles") then Record.Field(slaRecord, "completedCycles") else {},
+				            ongoingCycle = if slaRecord <> null and Record.HasFields(slaRecord, "ongoingCycle") then Record.Field(slaRecord, "ongoingCycle") else null,
+				            cycle = if List.Count(completedCycles) > 0 then List.First(completedCycles) else ongoingCycle,
+				
+				            elapsedMillis = if cycle <> null and Record.HasFields(cycle, "elapsedTime") and Record.Field(cycle, "elapsedTime") <> null then Record.Field(Record.Field(cycle, "elapsedTime"), "millis") else null,
+				            isBreached = if cycle <> null and Record.HasFields(cycle, "breached") then Record.Field(cycle, "breached") else null,
+				
+				            elapsedHours = if elapsedMillis <> null then Number.Round(elapsedMillis / 3600000, 2) else null
+				        in
+				            [Horas = elapsedHours, Vencido = isBreached],
+				
+				    // SLA Atención
+				    AddSLAAtencion = Table.AddColumn(TiposFechas, "_sla_atencion", each fnParseSLA([customfield_10232])),
+				    ExpandSLAAtencion = Table.ExpandRecordColumn(AddSLAAtencion, "_sla_atencion", {"Horas", "Vencido"}, {"Atencion_Horas", "Atencion_SLA_Vencido"}),
+				
+				    // SLA Resolución
+				    AddSLAResolucion = Table.AddColumn(ExpandSLAAtencion, "_sla_resolucion", each fnParseSLA([customfield_10233])),
+				    ExpandSLAResolucion = Table.ExpandRecordColumn(AddSLAResolucion, "_sla_resolucion", {"Horas", "Vencido"}, {"Resolucion_Horas", "Resolucion_SLA_Vencido"}),
+				
+				    // Tiempo total de cierre en días
+				    AddDiasTotales = Table.AddColumn(
+				        ExpandSLAResolucion,
+				        "Dias_Totales_Cierre",
+				        each
+				            if [resolutiondate] <> null then
+				                Number.Round(Duration.TotalDays([resolutiondate] - [created]), 2)
+				            else if [Estado] = "Resuelta" or [Estado] = "Cerrado" or [Estado] = "Closed" then
+				                Number.Round(Duration.TotalDays([updated] - [created]), 2)
+				            else
+				                null,
+				        type number
+				    ),
+				
+				    LimpioSLA = Table.RemoveColumns(AddDiasTotales, {"customfield_10232", "customfield_10233"}),
+				
+				    Renombrado =
+				        Table.RenameColumns(
+				            LimpioSLA,
+				            {
+				                {"key", "Ticket"},
+				                {"summary", "Nombre del Ticket"},
+				                {"created", "Creado"},
+				                {"updated", "Actualizado"},
+				                {"resolutiondate", "Fecha_Resolucion"}
+				            }
+				        ),
+				
+				    ColumnasFinales =
+				        Table.SelectColumns(
+				            Renombrado,
+				            {
+				                "Ticket",
+				                "Nombre del Ticket",
+				                "Estado",
+				                "Asignado",
+				                "Grupo_Resolutor",
+				                "Aplicacion",
+				                "Prioridad",
+				                "Tipo",
+				                "Planta",
+				                "Creado",
+				                "Fecha_Resolucion",
+				                "Actualizado",
+				                "Atencion_Horas",
+				                "Atencion_SLA_Vencido",
+				                "Resolucion_Horas",
+				                "Resolucion_SLA_Vencido",
+				                "Dias_Totales_Cierre",
+				                "Informante",
+				                "Componente",
+				                "Area_Requirente",
+				                "Horas_Trabajadas"
+				            }
+				        ),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(ColumnasFinales,{{"Atencion_SLA_Vencido", type logical}, {"Atencion_Horas", type number}}),
+				    #"Personalizada agregada" = Table.AddColumn(#"Tipo cambiado", "OrdenPrioridad", each if [Prioridad] = "Bloqueante" then 1
+				else if [Prioridad] = "Alta" then 2
+				else if [Prioridad] = "Media" then 3
+				else if [Prioridad] = "Baja" then 4
+				else 99)
+				in
+				    #"Personalizada agregada"
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+
